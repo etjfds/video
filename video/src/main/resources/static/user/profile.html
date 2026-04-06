@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心</title>
+    <link rel="stylesheet" href="/assets/vendor/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/vendor/tabler/tabler.min.css">
+    <link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+<div class="page-shell">
+<header class="page-topbar">
+    <div class="container page-topbar-inner">
+        <div class="brand-lockup">
+            <h1>个人中心</h1>
+            <span>资料设置、头像管理与内容回看</span>
+        </div>
+        <nav class="page-nav">
+            <a href="/user/index.html">首页</a>
+            <a href="/user/recommend.html">推荐页</a>
+            <a class="active" href="/user/profile.html">个人中心</a>
+            <a href="/admin/dashboard.html">管理端</a>
+        </nav>
+        <div id="user-nav"></div>
+    </div>
+</header>
+
+<main class="container page-content">
+    <div class="profile-shell">
+    <section class="surface-card profile-hero">
+        <div class="profile-identity">
+            <img id="hero-avatar" class="profile-avatar-lg" alt="用户头像">
+            <div class="profile-title">
+                <h2 id="hero-name">加载中...</h2>
+                <div class="profile-badges">
+                    <span class="app-badge">个人空间</span>
+                    <span class="app-badge" id="hero-role">USER</span>
+                    <span class="app-badge" id="hero-username">@username</span>
+                    <span class="app-badge" id="hero-id">ID 0</span>
+                </div>
+                <p class="profile-subtitle" id="hero-summary">在这里管理你的资料、头像、点赞和收藏内容。</p>
+            </div>
+        </div>
+        <div class="profile-summary">
+            <div class="stat-card">
+                <strong id="stat-likes">0</strong>
+                <span>点赞视频</span>
+            </div>
+            <div class="stat-card">
+                <strong id="stat-favorites">0</strong>
+                <span>收藏视频</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="profile-layout">
+        <div class="profile-stack">
+            <section class="surface-card">
+                <div class="surface-card__body">
+                <div class="surface-card__header">
+                    <h2>资料设置</h2>
+                    <span class="app-badge">基础信息</span>
+                </div>
+                <p class="surface-card__note">修改昵称后会同步更新顶部用户展示，仅保留必要的资料维护项。</p>
+                <form class="auth-form profile-form" id="profile-form">
+                    <label class="field-stack" for="realName">
+                        <span>显示名称</span>
+                        <input id="realName" class="app-input" placeholder="请输入个人展示名称">
+                    </label>
+                    <button class="app-btn app-btn-dark" type="submit">保存资料</button>
+                </form>
+                <p class="form-note" id="profile-base" style="margin-top: 16px;"></p>
+                </div>
+            </section>
+
+            <section class="surface-card">
+                <div class="surface-card__body">
+                <div class="surface-card__header">
+                    <h3>上传头像</h3>
+                    <span class="app-badge">本地文件</span>
+                </div>
+                <p class="surface-card__note">选择图片后即可上传，系统会自动替换当前头像并刷新个人中心展示。</p>
+                <div class="upload-box">
+                    <div class="auth-form">
+                        <div class="file-picker">
+                            <input id="avatarFile" class="file-input" type="file" accept="image/*">
+                            <label for="avatarFile" class="file-trigger">选择图片</label>
+                            <span id="avatarFileName" class="file-name">未选择文件</span>
+                        </div>
+                        <button class="app-btn app-btn-soft" type="button" onclick="uploadAvatar()">上传本地头像</button>
+                    </div>
+                    <p class="form-note" style="margin: 14px 0 0;">上传成功后会自动保存到服务端图片目录，并立即更新当前头像。</p>
+                </div>
+                </div>
+            </section>
+        </div>
+
+        <section class="surface-card">
+            <div class="surface-card__body">
+            <div class="surface-card__header">
+                <h2>头像预览</h2>
+                <span class="app-badge">实时预览</span>
+            </div>
+            <div class="profile-preview">
+                <img id="avatar-preview" alt="头像预览">
+            </div>
+            </div>
+        </section>
+    </section>
+
+    <div class="split">
+        <section class="surface-card">
+            <div class="surface-card__body">
+            <div class="surface-card__header">
+                <h2>我的点赞</h2>
+                <span class="app-badge" id="likes-count-badge">0 条</span>
+            </div>
+            <div id="like-list" class="grid"></div>
+            <div id="like-empty" class="empty-state" style="display:none;">还没有点赞过视频，去首页挑一些喜欢的内容吧。</div>
+            </div>
+        </section>
+        <section class="surface-card">
+            <div class="surface-card__body">
+            <div class="surface-card__header">
+                <h2>我的收藏</h2>
+                <span class="app-badge" id="favorites-count-badge">0 条</span>
+            </div>
+            <div id="favorite-list" class="grid"></div>
+            <div id="favorite-empty" class="empty-state" style="display:none;">还没有收藏任何视频，看到想反复看的内容就先收起来。</div>
+            </div>
+        </section>
+    </div>
+    </div>
+</main>
+</div>
+
+<script src="/assets/js/app.js"></script>
+<script src="/assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="/assets/vendor/tabler/tabler.min.js"></script>
+<script>
+if (!app.ensureLogin()) {}
+app.fillUserNav();
+let currentAvatarUrl = "";
+
+async function loadProfile() {
+    try {
+        const data = await app.request("/api/user/profile");
+        document.getElementById("realName").value = data.realName || "";
+        currentAvatarUrl = data.avatarUrl || "";
+        document.getElementById("avatar-preview").src = currentAvatarUrl;
+        document.getElementById("hero-avatar").src = currentAvatarUrl;
+        document.getElementById("hero-name").textContent = data.realName || data.username || "未命名用户";
+        document.getElementById("hero-summary").textContent = `欢迎回来，${data.realName || data.username}。这里可以维护头像资料，也可以快速回看你点赞和收藏过的视频。`;
+        document.getElementById("hero-role").textContent = data.role || "USER";
+        document.getElementById("hero-username").textContent = `@${data.username || ""}`;
+        document.getElementById("hero-id").textContent = `ID ${data.id || 0}`;
+        document.getElementById("profile-base").textContent = `账号 ID：${data.id} ｜ 用户名：${data.username} ｜ 角色：${data.role} ｜ 状态：${data.status === 1 ? "启用" : "禁用"}`;
+
+        const likes = data.myLikes || [];
+        const favorites = data.myFavorites || [];
+        document.getElementById("stat-likes").textContent = likes.length;
+        document.getElementById("stat-favorites").textContent = favorites.length;
+        document.getElementById("likes-count-badge").textContent = `${likes.length} 条`;
+        document.getElementById("favorites-count-badge").textContent = `${favorites.length} 条`;
+
+        app.renderVideoCards(likes, "like-list", {
+            refresh: loadProfile
+        });
+        app.renderVideoCards(favorites, "favorite-list", {
+            refresh: loadProfile
+        });
+        document.getElementById("like-empty").style.display = likes.length ? "none" : "block";
+        document.getElementById("favorite-empty").style.display = favorites.length ? "none" : "block";
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+document.getElementById("profile-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    try {
+        await app.request("/api/user/profile", {
+            method: "PUT",
+            body: JSON.stringify({
+                realName: document.getElementById("realName").value.trim(),
+                avatarUrl: currentAvatarUrl
+            })
+        });
+        loadProfile();
+    } catch (error) {
+        alert(error.message);
+    }
+});
+
+async function uploadAvatar() {
+    const fileInput = document.getElementById("avatarFile");
+    if (!fileInput.files.length) {
+        alert("请先选择一张图片");
+        return;
+    }
+    const formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+    try {
+        await app.request("/api/user/avatar", {
+            method: "POST",
+            body: formData
+        });
+        fileInput.value = "";
+        document.getElementById("avatarFileName").textContent = "未选择文件";
+        loadProfile();
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+document.getElementById("avatarFile").addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    document.getElementById("avatarFileName").textContent = file ? file.name : "未选择文件";
+});
+
+loadProfile();
+</script>
+</body>
+</html>

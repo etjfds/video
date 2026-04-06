@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>失效反馈</title>
+    <link rel="stylesheet" href="/assets/vendor/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/vendor/tabler/tabler.min.css">
+    <link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+<header class="header">
+    <div class="container header-inner">
+        <div class="brand">失效反馈</div>
+        <nav class="nav">
+            <a href="/admin/dashboard.html">概览</a>
+            <a class="secondary" href="/admin/users.html">用户管理</a>
+            <a class="secondary" href="/admin/videos.html">视频管理</a>
+        </nav>
+        <div id="user-nav" class="nav"></div>
+    </div>
+</header>
+
+<main class="container" style="padding: 28px 0 40px;">
+    <section class="panel">
+        <h2>视频失效反馈列表</h2>
+        <table class="list-table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>视频</th>
+                <th>用户</th>
+                <th>原因</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody id="report-table"></tbody>
+        </table>
+    </section>
+</main>
+
+<script src="/assets/js/app.js"></script>
+<script src="/assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="/assets/vendor/tabler/tabler.min.js"></script>
+<script>
+if (!app.ensureAdmin()) {}
+app.fillUserNav("/admin/login.html");
+
+async function loadReports() {
+    try {
+        const list = await app.request("/api/admin/reports");
+        document.getElementById("report-table").innerHTML = list.map(item => `
+            <tr>
+                <td>${item.id}</td>
+                <td>${item.videoTitle}</td>
+                <td>${item.username}</td>
+                <td>${item.reason || ""}</td>
+                <td><span class="status-pill ${item.status === 0 ? "pending" : item.status === 1 ? "resolved" : "muted"}">${item.status === 0 ? "待处理" : item.status === 1 ? "已确认" : "已忽略"}</span></td>
+                <td>
+                    <div class="action-stack">
+                        <button class="btn soft compact" onclick="handleReport(${item.id}, 1)">确认失效</button>
+                        <button class="btn ghost compact" onclick="handleReport(${item.id}, 2)">忽略</button>
+                    </div>
+                </td>
+            </tr>
+        `).join("");
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+async function handleReport(id, status) {
+    try {
+        await app.request(`/api/admin/reports/${id}/status?status=${status}`, { method: "PUT" });
+        loadReports();
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+loadReports();
+</script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户管理</title>
+    <link rel="stylesheet" href="/assets/vendor/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/vendor/tabler/tabler.min.css">
+    <link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+<div class="page-shell">
+<header class="page-topbar">
+    <div class="container page-topbar-inner">
+        <div class="brand-lockup">
+            <h1>后台管理</h1>
+            <span>账号、角色与权限状态</span>
+        </div>
+        <nav class="page-nav">
+            <a href="/admin/dashboard.html">概览</a>
+            <a class="active" href="/admin/users.html">用户管理</a>
+            <a href="/admin/videos.html">视频管理</a>
+            <a href="/admin/reports.html">失效反馈</a>
+        </nav>
+        <div id="user-nav"></div>
+    </div>
+</header>
+
+<main class="container page-content">
+    <div class="admin-layout">
+        <section class="surface-card">
+            <div class="surface-card__body">
+                <div class="surface-card__header">
+                <h2>账号列表</h2>
+                <span class="app-badge">分页查询</span>
+            </div>
+                <p class="surface-card__note">按用户名、姓名和角色筛选账号。普通管理员只能启停普通用户，超级管理员可以在右侧继续创建新的管理员账号。</p>
+                <div class="app-filter-grid">
+                    <input id="keyword" placeholder="用户名 / 姓名">
+                    <select id="role">
+                        <option value="">全部角色</option>
+                        <option value="USER">普通用户</option>
+                        <option value="ADMIN">管理员</option>
+                        <option value="SUPER_ADMIN">超管</option>
+                    </select>
+                    <button class="app-btn app-btn-dark" onclick="loadUsers(1)">查询账号</button>
+                </div>
+                <div class="app-table-wrap">
+                    <table class="app-table">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>用户名</th>
+                            <th>姓名</th>
+                            <th>角色</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody id="user-table"></tbody>
+                    </table>
+                </div>
+                <div id="user-pager"></div>
+            </div>
+        </section>
+
+        <section class="surface-card" id="create-admin-panel" style="display:none;">
+            <div class="surface-card__body admin-stack">
+                <div class="surface-card__header">
+                    <h2>新增管理员</h2>
+                    <span class="app-badge">SUPER ADMIN</span>
+                </div>
+                <p class="surface-card__note">创建新的后台管理员账号。该模块仅超级管理员可见，创建后账号默认启用。</p>
+                <form class="auth-form" id="admin-form">
+                    <input id="admin-username" placeholder="管理员用户名">
+                    <input id="admin-realName" placeholder="姓名">
+                    <input id="admin-password" type="password" placeholder="密码">
+                    <button class="app-btn app-btn-dark" type="submit">创建管理员</button>
+                </form>
+            </div>
+        </section>
+    </div>
+</main>
+</div>
+
+<script src="/assets/js/app.js"></script>
+<script src="/assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="/assets/vendor/tabler/tabler.min.js"></script>
+<script>
+if (!app.ensureAdmin()) {}
+app.fillUserNav("/admin/login.html");
+const currentUser = app.getUser();
+const userPageSize = 10;
+if (currentUser && currentUser.role === "SUPER_ADMIN") {
+    document.getElementById("create-admin-panel").style.display = "block";
+}
+
+async function loadUsers(page = 1) {
+    try {
+        const keyword = document.getElementById("keyword").value.trim();
+        const role = document.getElementById("role").value;
+        const query = new URLSearchParams({ page: String(page), pageSize: String(userPageSize) });
+        if (keyword) query.set("keyword", keyword);
+        if (role) query.set("role", role);
+        const pageData = await app.request(`/api/admin/users?${query.toString()}`);
+        const list = pageData.records || [];
+        document.getElementById("user-table").innerHTML = list.map(user => `
+            <tr>
+                <td>${user.id}</td>
+                <td>${user.username}</td>
+                <td>${user.realName}</td>
+                <td>${user.role}</td>
+                <td><span class="status-chip ${user.status === 1 ? "enabled" : "disabled"}">${user.status === 1 ? "启用" : "禁用"}</span></td>
+                <td>${user.role === "USER" ? `
+                    <div class="table-actions">
+                        <button class="app-btn app-btn-soft app-btn-sm" onclick="toggleUser(${user.id}, ${user.status === 1 ? 0 : 1}, ${page})">
+                        ${user.status === 1 ? "禁用" : "启用"}
+                        </button>
+                    </div>` : `<span class="table-meta">仅查看</span>`}
+                </td>
+            </tr>
+        `).join("");
+        app.renderPager("user-pager", pageData, loadUsers);
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+async function toggleUser(id, status, page) {
+    try {
+        await app.request(`/api/admin/users/${id}/status?status=${status}`, { method: "PUT" });
+        loadUsers(page);
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+document.getElementById("admin-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    try {
+        await app.request("/api/super-admin/admins", {
+            method: "POST",
+            body: JSON.stringify({
+                username: document.getElementById("admin-username").value.trim(),
+                realName: document.getElementById("admin-realName").value.trim(),
+                password: document.getElementById("admin-password").value.trim()
+            })
+        });
+        alert("管理员已创建");
+        loadUsers(1);
+    } catch (error) {
+        alert(error.message);
+    }
+});
+
+loadUsers(1);
+</script>
+</body>
+</html>

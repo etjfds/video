@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频首页</title>
+    <link rel="stylesheet" href="/assets/vendor/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/vendor/tabler/tabler.min.css">
+    <link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+<div class="page-shell">
+<header class="page-topbar">
+    <div class="container page-topbar-inner">
+        <div class="brand-lockup">
+            <h1>视频内容平台</h1>
+            <span>精选视频、兴趣发现与多模式播放</span>
+        </div>
+        <nav class="page-nav">
+            <a class="active" href="/user/index.html">首页</a>
+            <a href="/user/recommend.html">推荐页</a>
+            <a href="/user/profile.html">个人中心</a>
+            <a href="/admin/dashboard.html">管理端</a>
+        </nav>
+        <div id="user-nav"></div>
+    </div>
+</header>
+
+<main class="container page-content">
+    <section class="hero">
+        <h1>发现你想看的视频内容</h1>
+        <p>搜罗全网优质资源，随时随地开启你的兴趣之旅</p>
+        <div class="hero-search">
+            <input id="keyword" class="app-input" placeholder="输入标题或标签搜索">
+            <button class="app-btn app-btn-dark" onclick="loadVideos(1)">搜索</button>
+        </div>
+    </section>
+    <div id="video-list" class="grid"></div>
+    <div id="video-pager" class="pager"></div>
+</main>
+</div>
+
+<script src="/assets/js/app.js"></script>
+<script src="/assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="/assets/vendor/tabler/tabler.min.js"></script>
+<script>
+app.fillUserNav();
+let currentPage = 1;
+const pageSize = 12;
+
+async function loadVideos(page = 1) {
+    try {
+        currentPage = page;
+        const keyword = document.getElementById("keyword").value.trim();
+        const query = new URLSearchParams({
+            page: String(currentPage),
+            pageSize: String(pageSize)
+        });
+        if (keyword) {
+            query.set("keyword", keyword);
+        }
+        const pageData = await app.request(`/api/video/list?${query.toString()}`);
+        app.renderVideoCards(pageData.records || [], "video-list", {
+            refresh: () => loadVideos(currentPage)
+        });
+        app.renderPager("video-pager", pageData, loadVideos);
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+document.getElementById("keyword").addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        loadVideos(1);
+    }
+});
+
+loadVideos(1);
+</script>
+</body>
+</html>

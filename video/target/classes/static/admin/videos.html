@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频管理</title>
+    <link rel="stylesheet" href="/assets/vendor/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/vendor/tabler/tabler.min.css">
+    <link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+<div class="page-shell">
+<header class="page-topbar">
+    <div class="container page-topbar-inner">
+        <div class="brand-lockup">
+            <h1>后台管理</h1>
+            <span>视频发布、上下架与来源配置</span>
+        </div>
+        <nav class="page-nav">
+            <a href="/admin/dashboard.html">概览</a>
+            <a href="/admin/users.html">用户管理</a>
+            <a class="active" href="/admin/videos.html">视频管理</a>
+            <a href="/admin/reports.html">失效反馈</a>
+        </nav>
+        <div id="user-nav"></div>
+    </div>
+</header>
+
+<main class="container page-content">
+    <div class="admin-layout">
+        <section class="surface-card">
+            <div class="surface-card__body">
+                <div class="surface-card__header">
+                <h2>视频列表</h2>
+                <span class="app-badge">分页管理</span>
+            </div>
+                <p class="surface-card__note">根据标题、标签和上下架状态筛选视频。左侧列表负责浏览记录，右侧表单负责新增和覆盖更新。</p>
+                <div class="app-filter-grid">
+                    <input id="keyword" class="app-input" placeholder="标题 / 标签">
+                    <select id="status" class="app-select">
+                        <option value="">全部状态</option>
+                        <option value="0">草稿</option>
+                        <option value="1">已上架</option>
+                        <option value="2">已下架</option>
+                    </select>
+                    <button class="app-btn app-btn-dark" onclick="loadVideos(1)">查询视频</button>
+                </div>
+                <div class="app-table-wrap">
+                    <table class="app-table">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>标题</th>
+                            <th>模式</th>
+                            <th>状态</th>
+                            <th>统计</th>
+                            <th class="actions-col">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody id="video-table"></tbody>
+                    </table>
+                </div>
+                <div id="video-pager"></div>
+            </div>
+        </section>
+
+        <section class="surface-card">
+            <div class="surface-card__body">
+                <div class="surface-card__header">
+                <h2>发布 / 编辑视频</h2>
+                <span class="app-badge">表单编辑</span>
+            </div>
+                <p class="surface-card__note">留空视频 ID 表示新增；输入现有视频 ID 后会自动回填当前记录，保存时仅更新你实际填写过的字段。支持 `DIRECT / EMBED / LINK` 三种播放模式。</p>
+                <form class="auth-form" id="video-form">
+                    <input id="video-id" class="app-input" placeholder="视频ID，留空表示新增">
+                    <input id="title" class="app-input" placeholder="标题">
+                    <div class="cover-upload-panel">
+                        <div class="file-picker">
+                            <input id="coverFile" class="file-input" type="file" accept="image/*">
+                            <label for="coverFile" class="file-trigger">选择封面</label>
+                            <span id="coverFileName" class="file-name">未选择文件</span>
+                        </div>
+                        <div class="cover-upload-actions">
+                            <button class="app-btn app-btn-soft" type="button" onclick="uploadCover()">上传封面</button>
+                            <input id="coverUrl" class="app-input" placeholder="封面 URL">
+                        </div>
+                        <div class="cover-preview-box">
+                            <img id="coverPreview" class="cover-preview" alt="封面预览">
+                        </div>
+                    </div>
+                    <input id="playUrl" class="app-input" placeholder="播放 URL（DIRECT 可用）">
+                    <input id="embedUrl" class="app-input" placeholder="嵌入 URL（EMBED 可用）">
+                    <input id="sourceUrl" class="app-input" placeholder="原站 URL（LINK 推荐填写）">
+                    <input id="sourcePlatform" class="app-input" placeholder="来源平台，例如 WEIBO / DIRECT">
+                    <input id="tags" class="app-input" placeholder="标签，逗号分隔">
+                    <select id="playMode" class="app-select">
+                        <option value="">播放模式（编辑时留空表示不修改）</option>
+                        <option value="DIRECT">DIRECT 直链播放</option>
+                        <option value="EMBED">EMBED iframe 嵌入</option>
+                        <option value="LINK">LINK 原站跳转</option>
+                    </select>
+                    <select id="video-status" class="app-select">
+                        <option value="">状态（编辑时留空表示不修改）</option>
+                        <option value="0">草稿</option>
+                        <option value="1">已上架</option>
+                        <option value="2">已下架</option>
+                    </select>
+                    <textarea id="description" class="app-textarea" rows="4" placeholder="视频简介"></textarea>
+                    <button class="app-btn app-btn-dark" type="submit">保存视频</button>
+                </form>
+            </div>
+        </section>
+    </div>
+</main>
+</div>
+
+<script src="/assets/js/app.js"></script>
+<script src="/assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="/assets/vendor/tabler/tabler.min.js"></script>
+<script>
+if (!app.ensureAdmin()) {}
+app.fillUserNav("/admin/login.html");
+const videoPageSize = 10;
+
+async function loadVideos(page = 1) {
+    try {
+        const query = new URLSearchParams({ page: String(page), pageSize: String(videoPageSize) });
+        const keyword = document.getElementById("keyword").value.trim();
+        const status = document.getElementById("status").value;
+        if (keyword) query.set("keyword", keyword);
+        if (status) query.set("status", status);
+        const pageData = await app.request(`/api/admin/videos?${query.toString()}`);
+        const list = pageData.records || [];
+        document.getElementById("video-table").innerHTML = list.map(video => `
+            <tr>
+                <td>${video.id}</td>
+                <td>
+                    <div class="table-title">${video.title}</div>
+                    <div class="table-meta">来源：${video.sourcePlatform || "未设置"}</div>
+                </td>
+                <td>${video.playMode}</td>
+                <td><span class="status-chip ${video.status === 1 ? "published" : video.status === 2 ? "offline" : "draft"}">${video.status === 1 ? "已上架" : video.status === 2 ? "已下架" : "草稿"}</span></td>
+                <td>
+                    <div class="metric-stack">
+                        <span>播 ${video.playCount || 0}</span>
+                        <span>赞 ${video.likeCount || 0}</span>
+                        <span>藏 ${video.favoriteCount || 0}</span>
+                    </div>
+                </td>
+                <td class="actions-col">
+                    <div class="table-actions">
+                        <button class="app-btn app-btn-soft app-btn-sm" onclick="setEditId(${video.id})">填入ID</button>
+                    </div>
+                </td>
+            </tr>
+        `).join("");
+        app.renderPager("video-pager", pageData, loadVideos);
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+function resetVideoForm(keepId = false) {
+    const id = keepId ? document.getElementById("video-id").value.trim() : "";
+    document.getElementById("video-form").reset();
+    document.getElementById("video-id").value = id;
+    document.getElementById("coverFileName").textContent = "未选择文件";
+    syncCoverPreview();
+}
+
+async function setEditId(id) {
+    try {
+        resetVideoForm(true);
+        document.getElementById("video-id").value = String(id);
+        const video = await app.request(`/api/admin/videos/${id}`);
+        document.getElementById("title").value = video.title || "";
+        document.getElementById("coverUrl").value = video.coverUrl || "";
+        document.getElementById("playUrl").value = video.playUrl || "";
+        document.getElementById("embedUrl").value = video.embedUrl || "";
+        document.getElementById("sourceUrl").value = video.sourceUrl || "";
+        document.getElementById("sourcePlatform").value = video.sourcePlatform || "";
+        document.getElementById("tags").value = video.tags || "";
+        document.getElementById("playMode").value = video.playMode || "";
+        document.getElementById("video-status").value = video.status == null ? "" : String(video.status);
+        document.getElementById("description").value = video.description || "";
+        syncCoverPreview();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+function syncCoverPreview() {
+    const coverUrl = document.getElementById("coverUrl").value.trim();
+    const preview = document.getElementById("coverPreview");
+    if (coverUrl) {
+        preview.src = coverUrl;
+        preview.style.display = "block";
+    } else {
+        preview.removeAttribute("src");
+        preview.style.display = "none";
+    }
+}
+
+async function uploadCover() {
+    const fileInput = document.getElementById("coverFile");
+    if (!fileInput.files.length) {
+        alert("请先选择一张封面图片");
+        return;
+    }
+    const formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+    try {
+        const result = await app.request("/api/admin/videos/cover", {
+            method: "POST",
+            body: formData
+        });
+        document.getElementById("coverUrl").value = result.coverUrl || "";
+        fileInput.value = "";
+        document.getElementById("coverFileName").textContent = "未选择文件";
+        syncCoverPreview();
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+document.getElementById("video-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const id = document.getElementById("video-id").value.trim();
+    const playModeValue = document.getElementById("playMode").value;
+    const statusValue = document.getElementById("video-status").value;
+    const payload = {
+        title: document.getElementById("title").value.trim(),
+        coverUrl: document.getElementById("coverUrl").value.trim(),
+        playUrl: document.getElementById("playUrl").value.trim(),
+        embedUrl: document.getElementById("embedUrl").value.trim(),
+        sourceUrl: document.getElementById("sourceUrl").value.trim(),
+        sourcePlatform: document.getElementById("sourcePlatform").value.trim(),
+        tags: document.getElementById("tags").value.trim(),
+        playMode: playModeValue,
+        status: statusValue === "" ? null : Number(statusValue),
+        description: document.getElementById("description").value.trim()
+    };
+    try {
+        await app.request(id ? `/api/admin/videos/${id}` : "/api/admin/videos", {
+            method: id ? "PUT" : "POST",
+            body: JSON.stringify(payload)
+        });
+        alert("保存成功");
+        resetVideoForm();
+        loadVideos(1);
+    } catch (error) {
+        alert(error.message);
+    }
+});
+
+document.getElementById("coverFile").addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    document.getElementById("coverFileName").textContent = file ? file.name : "未选择文件";
+});
+
+document.getElementById("coverUrl").addEventListener("input", syncCoverPreview);
+
+loadVideos(1);
+syncCoverPreview();
+</script>
+</body>
+</html>

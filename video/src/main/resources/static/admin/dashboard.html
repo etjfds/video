@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理台</title>
+    <link rel="stylesheet" href="/assets/vendor/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/vendor/tabler/tabler.min.css">
+    <link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+<header class="header">
+    <div class="container header-inner">
+        <div class="brand">管理台</div>
+        <nav class="nav">
+            <a href="/admin/dashboard.html">概览</a>
+            <a class="secondary" href="/admin/users.html">用户管理</a>
+            <a class="secondary" href="/admin/videos.html">视频管理</a>
+            <a class="secondary" href="/admin/reports.html">失效反馈</a>
+            <a class="secondary" href="/user/index.html">返回用户端</a>
+        </nav>
+        <div id="user-nav" class="nav"></div>
+    </div>
+</header>
+
+<main class="container" style="padding: 28px 0 40px;">
+    <div class="panel">
+        <h2>管理概览</h2>
+        <p class="muted">这里先提供可直接使用的管理入口。用户管理用于启停普通用户，视频管理支持发布、上架、下架，失效反馈页可感知外部视频失效情况。</p>
+    </div>
+    <div class="split">
+        <section class="panel">
+            <h3>用户管理</h3>
+            <p class="muted">查看普通用户、管理员和超管账号；管理员只能启停普通用户。</p>
+            <a class="btn" href="/admin/users.html">进入用户管理</a>
+        </section>
+        <section class="panel">
+            <h3>视频管理</h3>
+            <p class="muted">发布视频时选择 `DIRECT / EMBED / LINK`，系统据此决定如何播放。</p>
+            <a class="btn" href="/admin/videos.html">进入视频管理</a>
+        </section>
+    </div>
+</main>
+
+<script src="/assets/js/app.js"></script>
+<script src="/assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="/assets/vendor/tabler/tabler.min.js"></script>
+<script>
+if (!app.ensureAdmin()) {}
+app.fillUserNav("/admin/login.html");
+</script>
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="detail-cover" content="">
+    <title>视频详情</title>
+    <link rel="stylesheet" href="/assets/vendor/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/vendor/tabler/tabler.min.css">
+    <link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+<header class="page-topbar">
+    <div class="container page-topbar-inner">
+        <div class="brand-lockup">
+            <h1>视频详情</h1>
+            <span>享受纯粹的播放体验</span>
+        </div>
+        <nav class="page-nav">
+            <a href="/user/index.html">首页</a>
+            <a href="/user/recommend.html">推荐页</a>
+            <a href="/user/profile.html">个人中心</a>
+        </nav>
+        <div id="user-nav"></div>
+    </div>
+</header>
+
+<main class="container player-layout">
+    <section class="player-box">
+        <div id="player-container"></div>
+        <div id="play-notice" class="notice" style="display:none;"></div>
+    </section>
+    <aside class="info-card panel">
+        <h2 id="title">加载中...</h2>
+        <p id="description" class="muted"></p>
+        <div id="stats" class="meta"></div>
+        <div id="tags" class="tags"></div>
+        <div class="side-actions">
+            <button class="btn" id="like-btn" onclick="toggleLike()">点赞 0</button>
+            <button class="btn secondary" id="favorite-btn" onclick="toggleFavorite()">收藏 0</button>
+            <button class="btn secondary" onclick="reportInvalid()">反馈失效</button>
+        </div>
+        <div class="side-actions">
+            <a class="btn secondary" id="source-link" target="_blank" rel="noopener">原站打开</a>
+        </div>
+    </aside>
+</main>
+
+<script src="/assets/js/app.js"></script>
+<script src="/assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="/assets/vendor/tabler/tabler.min.js"></script>
+<script>
+app.fillUserNav();
+const videoId = new URLSearchParams(location.search).get("id");
+let currentDetail = null;
+
+function renderDetail(detail) {
+    currentDetail = detail;
+    document.getElementById("title").textContent = detail.title;
+    document.getElementById("description").textContent = detail.description || "暂无简介";
+    document.getElementById("stats").textContent = `播放 ${detail.playCount || 0} · 点赞 ${detail.likeCount || 0} · 收藏 ${detail.favoriteCount || 0} · 来源 ${detail.sourcePlatform || "未设置"}`;
+    document.getElementById("tags").innerHTML = (detail.tags || []).map(tag => `<span class="tag">${tag}</span>`).join("");
+    document.getElementById("source-link").href = detail.sourceUrl || detail.playUrl || detail.embedUrl || "#";
+    document.querySelector('meta[name="detail-cover"]').content = detail.coverUrl || "";
+    syncActionButton("like-btn", !!detail.liked, detail.likeCount || 0, "点赞", "已点赞");
+    syncActionButton("favorite-btn", !!detail.favorited, detail.favoriteCount || 0, "收藏", "已收藏");
+}
+
+function syncActionButton(buttonId, active, count, idleLabel, activeLabel) {
+    const button = document.getElementById(buttonId);
+    if (!button) {
+        return;
+    }
+    button.textContent = `${active ? activeLabel : idleLabel} ${count}`;
+    button.classList.toggle("btn-primary", active);
+    button.classList.toggle("secondary", !active);
+}
+
+async function loadDetail(playOnLoad = false) {
+    try {
+        const detail = await app.request(`/api/video/${videoId}`);
+        renderDetail(detail);
+        if (playOnLoad) {
+            const playData = await app.request(`/api/video/${videoId}/play`, { method: "POST" });
+            renderPlayer(playData);
+            if (currentDetail) {
+                renderDetail({
+                    ...currentDetail,
+                    playCount: (currentDetail.playCount || 0) + 1
+                });
+            }
+        }
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+function renderPlayer(playData) {
+    const container = document.getElementById("player-container");
+    const notice = document.getElementById("play-notice");
+    notice.style.display = "none";
+    if (playData.playMode === "DIRECT") {
+        container.innerHTML = `<div class="player-shell"><video controls src="${playData.playUrl}"></video></div>`;
+        return;
+    }
+    if (playData.playMode === "EMBED") {
+        container.innerHTML = `<div class="player-shell"><iframe class="player-frame" src="${playData.embedUrl}" allowfullscreen></iframe></div>`;
+        notice.style.display = "block";
+        notice.textContent = "当前视频使用第三方播放器嵌入，如果源站策略变化，可点击右侧“原站打开”。";
+        return;
+    }
+    container.innerHTML = `
+        <div class="player-shell">
+        <div class="link-mode-card">
+            <h3>当前视频使用原站播放模式</h3>
+            <p class="muted">这类来源通常不适合直接 iframe 嵌入。为了保证能播放，系统会引导你打开原站地址。</p>
+            <div style="margin: 18px 0;">
+                <a href="${playData.sourceUrl || playData.playUrl}" target="_blank" rel="noopener">
+                    <img id="link-mode-cover" class="link-mode-cover" alt="${playData.title}">
+                </a>
+            </div>
+            <div class="side-actions">
+                <a class="btn" href="${playData.sourceUrl || playData.playUrl}" target="_blank" rel="noopener">立即打开原站播放</a>
+                <a class="btn secondary" href="${playData.sourceUrl || playData.playUrl}">当前页打开原站</a>
+            </div>
+        </div>
+        </div>
+    `;
+    const detailCover = document.querySelector('meta[name="detail-cover"]');
+    const cover = document.getElementById("link-mode-cover");
+    if (cover && detailCover) {
+        cover.src = detailCover.content || "";
+    }
+}
+
+async function toggleLike() {
+    if (!app.ensureLogin()) return;
+    try {
+        await app.request(`/api/video/${videoId}/like`, { method: "POST" });
+        loadDetail(false);
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+async function toggleFavorite() {
+    if (!app.ensureLogin()) return;
+    try {
+        await app.request(`/api/video/${videoId}/favorite`, { method: "POST" });
+        loadDetail(false);
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+async function reportInvalid() {
+    if (!app.ensureLogin()) return;
+    const reason = prompt("请输入失效原因，例如：打不开、跳登录、视频被删除");
+    if (!reason) return;
+    try {
+        await app.request(`/api/video/${videoId}/report`, {
+            method: "POST",
+            body: JSON.stringify({ reason })
+        });
+        alert("反馈已提交");
+        loadDetail(false);
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+loadDetail(true);
+</script>
+</body>
+</html>

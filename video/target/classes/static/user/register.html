@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户注册</title>
+    <link rel="stylesheet" href="/assets/vendor/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/vendor/tabler/tabler.min.css">
+    <link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+<div class="auth-wrap">
+    <div class="auth-card">
+        <h1>创建普通用户账号</h1>
+        <form class="auth-form" id="register-form">
+            <input id="username" placeholder="用户名">
+            <input id="realName" placeholder="姓名">
+            <input id="password" type="password" placeholder="密码，至少 6 位">
+            <button class="btn" type="submit">注册并登录</button>
+            <a class="btn secondary" href="/user/login.html">返回登录</a>
+        </form>
+    </div>
+</div>
+<script src="/assets/js/app.js"></script>
+<script src="/assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="/assets/vendor/tabler/tabler.min.js"></script>
+<script>
+document.getElementById("register-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    try {
+        const data = await app.request("/api/auth/register", {
+            method: "POST",
+            body: JSON.stringify({
+                username: document.getElementById("username").value.trim(),
+                realName: document.getElementById("realName").value.trim(),
+                password: document.getElementById("password").value.trim()
+            })
+        });
+        app.saveSession(data);
+        location.href = "/user/index.html";
+    } catch (error) {
+        alert(error.message);
+    }
+});
+</script>
+</body>
+</html>

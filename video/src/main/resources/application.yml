@@ -1,0 +1,40 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: video
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/video_portal?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+  sql:
+    init:
+      mode: never
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    root: info
+    com.xiyou.video: info
+    org.mybatis: info
+    org.apache.ibatis: info
+    com.zaxxer.hikari: info
+
+app:
+  jwt:
+    secret: replace-with-a-strong-secret-key-for-production
+    expire-hours: 72
+  file:
+    image-dir: ${APP_IMAGE_DIR:./data/img}

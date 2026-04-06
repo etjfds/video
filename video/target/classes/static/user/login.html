@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户登录</title>
+    <link rel="stylesheet" href="/assets/vendor/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/vendor/tabler/tabler.min.css">
+    <link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+<div class="auth-wrap">
+    <div class="auth-card">
+        <h1>普通用户登录</h1>
+        <p class="muted">演示账号：`demo / 123456`</p>
+        <form class="auth-form" id="login-form">
+            <input id="username" placeholder="请输入用户名" value="demo">
+            <input id="password" type="password" placeholder="请输入密码" value="123456">
+            <button class="btn" type="submit">登录</button>
+            <a class="btn secondary" href="/user/register.html">去注册</a>
+            <a class="btn secondary" href="/admin/login.html">管理员登录</a>
+        </form>
+    </div>
+</div>
+<script src="/assets/js/app.js"></script>
+<script src="/assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="/assets/vendor/tabler/tabler.min.js"></script>
+<script>
+document.getElementById("login-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    try {
+        const data = await app.request("/api/auth/login", {
+            method: "POST",
+            body: JSON.stringify({
+                username: document.getElementById("username").value.trim(),
+                password: document.getElementById("password").value.trim()
+            })
+        });
+        app.saveSession(data);
+        location.href = "/user/index.html";
+    } catch (error) {
+        alert(error.message);
+    }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>推荐页</title>
+    <link rel="stylesheet" href="/assets/vendor/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/vendor/tabler/tabler.min.css">
+    <link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+<header class="page-topbar">
+    <div class="container page-topbar-inner">
+        <div class="brand-lockup">
+            <h1>推荐广场</h1>
+            <span>为你量身定制的内容</span>
+        </div>
+        <nav class="page-nav">
+            <a href="/user/index.html">首页</a>
+            <a class="active" href="/user/recommend.html">推荐页</a>
+            <a href="/user/profile.html">个人中心</a>
+        </nav>
+        <div id="user-nav"></div>
+    </div>
+</header>
+
+<main class="container" style="padding-top: 28px;">
+    <div class="panel">
+        <div class="recommend-toolbar">
+            <div>
+                <h2 id="algorithm-title">标签偏好推荐</h2>
+                <p class="muted" id="algorithm-desc">根据你的播放、点赞、收藏标签生成个性化推荐，适合快速找到同类内容。</p>
+            </div>
+            <div id="algorithm-switcher" class="recommend-switcher"></div>
+        </div>
+    </div>
+    <div id="recommend-list" class="grid"></div>
+    <div id="recommend-pager" class="pager"></div>
+</main>
+
+<script src="/assets/js/app.js"></script>
+<script src="/assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="/assets/vendor/tabler/tabler.min.js"></script>
+<script>
+app.fillUserNav();
+const recommendPageSize = 12;
+const recommendAlgorithms = {
+    content: {
+        label: "相似内容",
+        title: "相似内容推荐",
+        description: "基于视频内容的标签相似度进行推荐，帮助你发现与已喜欢视频相似的内容。"
+    },
+    similar: {
+        label: "相似用户",
+        title: "相似用户推荐",
+        description: "查找和你有相似兴趣行为的用户，再推荐他们也喜欢的视频，适合发现新内容。"
+    },
+    preference: {
+        label: "智能偏好",
+        title: "智能偏好推荐",
+        description: "根据你的播放、点赞、收藏标签生成个性化推荐，适合快速找到同类内容。"
+    },
+    hybrid: {
+        label: "混合推荐",
+        title: "混合推荐",
+        description: "综合热门趋势和个人偏好的混合推荐算法，平衡流行度和个性化。"
+    }
+};
+let currentAlgorithm = "hybrid";
+let currentRecommendPage = 1;
+
+function renderAlgorithmSwitcher() {
+    const container = document.getElementById("algorithm-switcher");
+    container.innerHTML = Object.entries(recommendAlgorithms).map(([key, item]) => `
+        <button class="recommend-chip ${key === currentAlgorithm ? "active" : ""}" data-algorithm="${key}">
+            ${item.label}
+        </button>
+    `).join("");
+    container.querySelectorAll("[data-algorithm]").forEach(button => {
+        button.addEventListener("click", () => loadRecommend(1, button.dataset.algorithm));
+    });
+}
+
+function syncAlgorithmMeta() {
+    const user = app.getUser();
+    const config = recommendAlgorithms[currentAlgorithm];
+    document.getElementById("algorithm-title").textContent = config.title;
+    document.getElementById("algorithm-desc").textContent = user
+        ? config.description
+        : `${config.description} 未登录时会自动回退到公开推荐策略。`;
+}
+
+async function loadRecommend(page = 1, algorithm = currentAlgorithm) {
+    currentRecommendPage = page;
+    currentAlgorithm = algorithm;
+    renderAlgorithmSwitcher();
+    syncAlgorithmMeta();
+    try {
+        const pageData = await app.request(`/api/video/recommend?algorithm=${encodeURIComponent(currentAlgorithm)}&page=${page}&pageSize=${recommendPageSize}`);
+        app.renderVideoCards(pageData.records || [], "recommend-list", {
+            refresh: () => loadRecommend(currentRecommendPage, currentAlgorithm)
+        });
+        app.renderPager("recommend-pager", pageData, nextPage => loadRecommend(nextPage, currentAlgorithm));
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+renderAlgorithmSwitcher();
+syncAlgorithmMeta();
+loadRecommend(1);
+</script>
+</body>
+</html>
