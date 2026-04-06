@@ -1,0 +1,254 @@
+[
+  {
+    "user_id": "new_user_999",
+    "video_id": "5259772249964614",
+    "behavior_type": "收藏",
+    "weight": 1.0,
+    "behavior_time": "2026-03-21 18:18:13"
+  },
+  {
+    "user_id": "test_user_001",
+    "video_id": "5260727951228931",
+    "behavior_type": "观看",
+    "weight": 0.1,
+    "behavior_time": "2026-03-21"
+  },
+  {
+    "user_id": "test_user_001",
+    "video_id": "5260727951228931",
+    "behavior_type": "观看",
+    "weight": 0.1,
+    "behavior_time": "2026-03-21"
+  },
+  {
+    "user_id": "new_user_002",
+    "video_id": "5259312390406147",
+    "behavior_type": "观看",
+    "weight": 0.1,
+    "behavior_time": "2026-03-21"
+  },
+  {
+    "user_id": "test_user_001",
+    "video_id": "5260727951228931",
+    "behavior_type": "观看",
+    "weight": 0.1,
+    "behavior_time": "2026-03-21"
+  },
+  {
+    "user_id": "test_user_001",
+    "video_id": "5260727951228931",
+    "behavior_type": "观看",
+    "weight": 0.1,
+    "behavior_time": "2026-03-21"
+  },
+  {
+    "user_id": "new_user_002",
+    "video_id": "5259312390406147",
+    "behavior_type": "观看",
+    "weight": 0.1,
+    "behavior_time": "2026-03-21"
+  },
+  {
+    "user_id": "app_user_10086",
+    "video_id": "99999",
+    "behavior_type": "观看",
+    "weight": 0.1,
+    "behavior_time": "2026-03-22 01:10:39"
+  },
+  {
+    "user_id": "app_user_10086",
+    "video_id": "99999",
+    "behavior_type": "观看",
+    "weight": 0.1,
+    "behavior_time": "2026-03-22 01:16:34"
+  },
+  {
+    "user_id": "app_user_10086",
+    "video_id": "99999",
+    "behavior_type": "观看",
+    "weight": 0.1,
+    "behavior_time": "2026-03-22 01:29:09"
+  },
+  {
+    "user_id": "app_user_10086",
+    "video_id": "99999",
+    "behavior_type": "观看",
+    "weight": 0.1,
+    "behavior_time": "2026-03-22 01:41:19"
+  },
+  {
+    "user_id": "test_user_001",
+    "video_id": "5260727951228931",
+    "behavior_type": "观看",
+    "weight": 0.1,
+    "behavior_time": "2026-03-22"
+  },
+  {
+    "user_id": "test_user_001",
+    "video_id": "5260727951228931",
+    "behavior_type": "观看",
+    "weight": 0.1,
+    "behavior_time": "2026-03-22"
+  },
+  {
+    "user_id": "new_user_002",
+    "video_id": "5259312390406147",
+    "behavior_type": "观看",
+    "weight": 0.1,
+    "behavior_time": "2026-03-22"
+  },
+  {
+    "user_id": "test_user_001",
+    "video_id": "5260727951228931",
+    "behavior_type": "观看",
+    "weight": 0.1,
+    "behavior_time": "2026-03-22"
+  },
+  {
+    "user_id": "test_user_001",
+    "video_id": "5260727951228931",
+    "behavior_type": "观看",
+    "weight": 0.1,
+    "behavior_time": "2026-03-22"
+  },
+  {
+    "user_id": "new_user_002",
+    "video_id": "5259312390406147",
+    "behavior_type": "观看",
+    "weight": 0.1,
+    "behavior_time": "2026-03-22"
+  },
+  {
+    "user_id": "test_user_001",
+    "video_id": "5260727951228931",
+    "behavior_type": "观看",
+    "weight": 0.1,
+    "behavior_time": "2026-03-22"
+  },
+  {
+    "user_id": "test_user_001",
+    "video_id": "5260727951228931",
+    "behavior_type": "观看",
+    "weight": 0.1,
+    "behavior_time": "2026-03-22"
+  },
+  {
+    "user_id": "new_user_002",
+    "video_id": "5259312390406147",
+    "behavior_type": "观看",
+    "weight": 0.1,
+    "behavior_time": "2026-03-22"
+  },
+  {
+    "user_id": "app_user_10086",
+    "video_id": "99999",
+    "behavior_type": "观看",
+    "weight": 0.1,
+    "behavior_time": "2026-03-22 02:05:44"
+  },
+  {
+    "user_id": "lgb_new_user_888",
+    "video_id": 5260727951228931,
+    "behavior_type": "观看",
+    "weight": 0.1,
+    "behavior_time": "2026-03-22 02:31:02"
+  },
+  {
+    "user_id": "lgb_new_user_888",
+    "video_id": 5260727951228931,
+    "behavior_type": "观看",
+    "weight": 0.1,
+    "behavior_time": "2026-03-22 02:31:02"
+  },
+  {
+    "user_id": "lgb_new_user_888",
+    "video_id": 5260727951228931,
+    "behavior_type": "点赞",
+    "weight": 0.5,
+    "behavior_time": "2026-03-22 02:31:02"
+  },
+  {
+    "user_id": "lgb_new_user_888",
+    "video_id": 5260727951228931,
+    "behavior_type": "收藏",
+    "weight": 1.0,
+    "behavior_time": "2026-03-22 02:31:02"
+  },
+  {
+    "user_id": "lgb_new_user_888",
+    "video_id": 5260727041064991,
+    "behavior_type": "观看",
+    "weight": 0.1,
+    "behavior_time": "2026-03-22 02:31:02"
+  },
+  {
+    "user_id": "test_user_001",
+    "video_id": "5260727951228931",
+    "behavior_type": "观看",
+    "weight": 0.1,
+    "behavior_time": "2026-03-22"
+  },
+  {
+    "user_id": "test_user_001",
+    "video_id": "5260727951228931",
+    "behavior_type": "观看",
+    "weight": 0.1,
+    "behavior_time": "2026-03-22"
+  },
+  {
+    "user_id": "test_user_001",
+    "video_id": "5260727041064991",
+    "behavior_type": "点赞",
+    "weight": 0.5,
+    "behavior_time": "2026-03-22"
+  },
+  {
+    "user_id": "new_user_002",
+    "video_id": "5259312390406147",
+    "behavior_type": "观看",
+    "weight": 0.1,
+    "behavior_time": "2026-03-22"
+  },
+  {
+    "user_id": "new_user_002",
+    "video_id": "5258677444345963",
+    "behavior_type": "点赞",
+    "weight": 0.5,
+    "behavior_time": "2026-03-22"
+  },
+  {
+    "user_id": "new_user_002",
+    "video_id": "5258598297567259",
+    "behavior_type": "收藏",
+    "weight": 1.0,
+    "behavior_time": "2026-03-22"
+  },
+  {
+    "user_id": "app_user_10086",
+    "video_id": "99999",
+    "behavior_type": "观看",
+    "weight": 0.1,
+    "behavior_time": "2026-03-22 02:34:39"
+  },
+  {
+    "user_id": "app_user_10086",
+    "video_id": "4882546576785591",
+    "behavior_type": "点赞",
+    "weight": 0.5,
+    "behavior_time": "2026-03-22 03:10:28"
+  },
+  {
+    "user_id": "app_user_10086",
+    "video_id": "99999",
+    "behavior_type": "观看",
+    "weight": 0.1,
+    "behavior_time": "2026-03-22 03:10:28"
+  },
+  {
+    "user_id": "app_user_10086",
+    "video_id": "88888",
+    "behavior_type": "收藏",
+    "weight": 1.0,
+    "behavior_time": "2026-03-22 03:10:28"
+  }
+]

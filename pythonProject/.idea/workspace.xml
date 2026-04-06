@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="722bc5d7-345c-42b4-b761-08be3450656e" name="更改" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="3948otVvS6zdvYYYubb9JkSq6UT" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+    <option name="showMembers" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.1.executor": "Run",
+    "Python.cbr_algorithm_metrics.executor": "Run",
+    "Python.cf_algorithm_metrics.executor": "Run",
+    "Python.data_preprocess.executor": "Run",
+    "Python.delete，.executor": "Run",
+    "Python.fix json.executor": "Run",
+    "Python.lightgbm.executor": "Run",
+    "Python.lightgbm2.executor": "Run",
+    "Python.lightgbm_algorithm.executor": "Run",
+    "Python.mix.executor": "Run",
+    "Python.pachong.executor": "Run",
+    "Python.plot_stats.executor": "Run",
+    "Python.shujuchuli.executor": "Run",
+    "Python.totcb_userbehavior.executor": "Run",
+    "Python.user_behavior.executor": "Run",
+    "Python.xls-json.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "last_opened_file_path": "D:/xx/毕设/pythonProject"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-7a29c1521ef0-d3b881c8e49f-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-233.11799.298" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="应用程序级" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="默认任务">
+      <changelist id="722bc5d7-345c-42b4-b761-08be3450656e" name="更改" comment="" />
+      <created>1769944160815</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1769944160815</updated>
+    </task>
+    <servers />
+  </component>
+</project>

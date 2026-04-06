@@ -1,0 +1,7 @@
+{
+  "module_name": "lightgbm",
+  "module_weight": 0.3,
+  "score_min": 0.0219,
+  "score_max": 1.0,
+  "score_normalize": true
+}

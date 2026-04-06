@@ -1,0 +1,2 @@
+﻿precision@10,recall@10,f1@10,mrr,cold_start_precision,coverage
+0.068,0.049,0.057,0.086,0.038,0.2612

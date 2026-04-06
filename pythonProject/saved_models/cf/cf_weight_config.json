@@ -1,0 +1,7 @@
+{
+  "module_name": "collaborative_filtering",
+  "module_weight": 0.4,
+  "score_min": 0.3173,
+  "score_max": 1.0,
+  "score_normalize": true
+}
